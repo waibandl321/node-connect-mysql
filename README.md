@@ -6,6 +6,10 @@ Node.jsでローカル開発環境(MAMP)のMYSQLに接続し、
 CRUDを満たす4つのメソッド(Create / Read / Update / Delete)で処理を記述  
 PUTメソッドでのデータ更新は実装中。  
 
+ユーザー情報のJSON取得するためのURL
+/api/v1/users  
+
+
 # 各ファイルの役割  
 
 ■ db_connect.js   : node.jsのサーバー側の記述(モジュールの読み込み、MySQLとの接続、HTTPメソッドを記述)  

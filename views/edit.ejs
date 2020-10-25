@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+      
+        .edit_user__inner {
+            border: 1px solid #ddd;
+            position: relative;
+            background-color: #fff;
+            padding: 30px;
+            width: 320px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .edit_user__form {
+            width: 100%;
+        }
+        .edit_user__form p + p {
+            margin-top: 20px;
+        }
+        input[type="text"],
+        input[type="email"],
+        button[type="submit"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            box-sizing: border-box;
+            padding: 0 10px;
+            border-radius: 5px;
+        }
+        input[type="text"],
+        input[type="email"] {
+            background-color: #eee;
+        }
+        button[type="submit"] {
+            background-color: skyblue;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: .3s;
+        }
+        button[type="submit"]:hover {
+            opacity: .8;
+            transition: .3s;
+        }
+        .edit_user__close_button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <% users.forEach(function(value) { %>
+        <div class="edit_user" id="<%= value.id %>">
+            <div class="edit_user__inner">
+                <form class="edit_user__form" method="POST">
+                    <p>
+                        <input type="text" name="edit_name" value="<%= value.name %>" class="edit_name">
+                    </p>
+                    <p>
+                        <input type="email" name="edit_email" value="<%= value.email %>" class="edit_email">
+                    </p>
+                    <p>
+                        <button type="submit" class="update_button" data-id="<%= value.id %>">更新</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    <% }); %>
+
+    <script>
+        // 削除ボタンを押した時にDELETEメソッドに処理を渡して、データ削除後にリダイレクト
+        const editSubmits = document.querySelectorAll('.update_button').forEach((editSubmit) => {
+            const url = location.href;
+            console.log(url);
+            editSubmit.addEventListener('click', (event) => {
+                const edit_name = document.querySelector('.edit_name').value;
+                const edit_email = document.querySelector('.edit_email').value;
+                const id = editSubmit.getAttribute('data-id');
+                const body = {
+                    id: id,
+                    name: edit_name,
+                    email: edit_email
+                };
+                fetch(url, {
+                    method: 'POST',
+                    body: body
+                })
+                .then((response) => console.log(response));
+            });
+        });
+    </script>
+</body>
+</html>

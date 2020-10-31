@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js MySQL デモ</title>
+    <style>
+        .user_list {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .user_list table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            text-align: left;
+        }
+        .user_list table tr td,
+        .user_list table tr th {
+            border: 1px solid #ddd;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .right {
+            float: right;
+        }
+        .form {
+            margin-top: 50px;
+        }
+        .to_posts {
+            margin-top: 20px;
+        }
+        textarea {
+            width: 100%;
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="user_list">
+        <p class="right">ログイン中のユーザー : <%= user[0].id %></p>
+        <h2>マイページ</h2>
+        <form action="/posts" method="post" class="form">
+            <div>
+                <textarea name="post"></textarea>
+            </div>
+            <div>
+                <input type="hidden" name="user_id" value="<%= user[0].id %>">
+                <input type="submit" value="投稿">
+            </div>
+        </form>
+        <div class="to_posts">
+            <a href="/posts">投稿一覧へ</a>
+        </div>
+    </div>
+    <script>
+
+
+    </script>
+</body>
+</html>

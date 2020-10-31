@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .posts {
+            width: 800px;
+            margin: 0 auto;
+        }
+        .right {
+            float: right;
+        }
+        .post {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="posts">
+        <% const id = user.id %>
+        <p class="right">ログイン中のユーザーID : <%= id %></p>
+        <h2>投稿一覧</h2>
+        <% posts.forEach((post) => { %>
+            <div class="post">
+                <% const timestamps = post.created_at %>
+                <p>投稿者 : <%= post.user_id %></p>
+                <p>投稿内容 : <%= post.content %></p>
+                <p>作成日時 : <span id="date"><%= timestamps.getFullYear() %>/<%= timestamps.getMonth()  %>/<%= timestamps.getDate() %></span></p>
+            </div>
+        <% }); %>
+    </div>
+    <script>
+
+    </script>
+</body>
+</html>

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-      
         .edit_user__inner {
             border: 1px solid #ddd;
             position: relative;
@@ -16,6 +15,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+        }
+        .edit_user__inner > h2 {
+            text-align: center;
         }
         .edit_user__form {
             width: 100%;
@@ -61,6 +63,7 @@
     <% users.forEach(function(value) { %>
         <div class="edit_user" id="<%= value.id %>">
             <div class="edit_user__inner">
+                <h2>ユーザー情報の更新</h2>
                 <form class="edit_user__form" method="POST">
                     <p>
                         <input type="text" name="edit_name" value="<%= value.name %>" class="edit_name">

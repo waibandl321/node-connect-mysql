@@ -20,8 +20,7 @@
 </head>
 <body>
     <div class="posts">
-        <% const id = user.id %>
-        <p class="right">ログイン中のユーザーID : <%= id %></p>
+        <p class="right">ログイン中のユーザーID : <%= user.id %></p>
         <h2>投稿一覧</h2>
         <% posts.forEach((post) => { %>
             <div class="post">
@@ -31,6 +30,7 @@
                 <p>作成日時 : <span id="date"><%= timestamps.getFullYear() %>/<%= timestamps.getMonth()  %>/<%= timestamps.getDate() %></span></p>
             </div>
         <% }); %>
+        <a href="/mypage">マイページへ</a>
     </div>
     <script>
 

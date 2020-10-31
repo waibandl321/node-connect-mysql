@@ -5,28 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Node.js MySQL デモ</title>
     <style>
-        .user_list {
+        .list {
             max-width: 800px;
             width: 100%;
             margin: 0 auto;
-        }
-        .user_list table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: auto;
-            text-align: left;
-        }
-        .user_list table tr td,
-        .user_list table tr th {
-            border: 1px solid #ddd;
-            padding: 5px;
-            box-sizing: border-box;
         }
         .right {
             float: right;
         }
         .form {
-            margin-top: 50px;
+            margin-top: 20px;
         }
         .to_posts {
             margin-top: 20px;
@@ -35,28 +23,85 @@
             width: 100%;
             resize: none;
         }
+        .link {
+            display: flex;
+        }
+        hr {
+            margin: 50px 0 0;
+        }
+        .edit_form {
+            margin-top: 20px;
+            display: none;
+        }
+        .edit_form.is-active {
+            display: block;
+        }
+        .post {
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
-    <div class="user_list">
-        <p class="right">ログイン中のユーザー : <%= user[0].id %></p>
+    <div class="list">
         <h2>マイページ</h2>
+        <p class="right">ユーザーID : <%= user.id %></p>
         <form action="/posts" method="post" class="form">
             <div>
                 <textarea name="post"></textarea>
             </div>
             <div>
-                <input type="hidden" name="user_id" value="<%= user[0].id %>">
+                <input type="hidden" name="user_id" value="<%= user.id %>">
                 <input type="submit" value="投稿">
             </div>
         </form>
         <div class="to_posts">
             <a href="/posts">投稿一覧へ</a>
+            <a href="/logout">ログアウト</a>
+        </div>
+        <hr>
+        <div class="posts">
+            <h2>あなたの投稿</h2>
+            <% posts.forEach((post) => { %>
+                <div class="post">
+                    <div class="post_content">
+                        <p class="content ">投稿内容 : <%= post.content %></p>
+                        <p class="created_at ">作成時間 : <%= post.created_at.getFullYear() %>/<%= post.created_at.getMonth() %>/<%= post.created_at.getDate() %></p>
+                        <div class="link">
+                            <button class="edit_btn">編集</button>
+                            <form action="/post/<%= post.id %>/delete" method="POST">
+                                <input type="hidden" value="<%= post.id %>" name="delete_post">
+                                <input type="submit" value="削除">
+                            </form>
+                        </div>
+                    </div>
+                    <form method="POST" class="edit_form" action="/post/:id/update">
+                        <div>
+                            <textarea name="edit_content" cols="20" rows="5" style="resize: none;"><%= post.content %></textarea>
+                        </div>
+                        <div>
+                            <input type="hidden" value="<%= post.id %>" name="post_id">
+                            <input type="submit" value="更新">
+                            <input type="button" value="閉じる" class="close_btn">
+                        </div>
+                    </form>
+                </div>
+            <% }); %>
         </div>
     </div>
     <script>
-
-
+        const posts = document.querySelectorAll('.post');
+        posts.forEach(post => {
+            const editBtn = post.querySelector('.edit_btn');
+            editBtn.addEventListener('click', () => {
+                post.querySelector('.edit_form').classList.add('is-active');
+            });
+            const closeBtn = post.querySelector('.close_btn');
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                post.querySelector('.edit_form').classList.remove('is-active');
+            });
+        });
     </script>
 </body>
 </html>

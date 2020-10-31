@@ -41,7 +41,7 @@ app.use(session({
 // body-parserをミドルウェアとして設定
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
-app.use(passport.session())
+app.use(passport.session());
 // テンプレートエンジンとしてejsを使用するための記述
 app.set('view engine', 'ejs');
 
@@ -92,21 +92,24 @@ app.post('/signin', [
         const userData = req.body;
         // パスワードのハッシュ化
         const password = userData.password;
-        const hashedPassword = bcrypt.hashSync(password, 10);
-        // ユニークなIDでinsert
-        const id = uuidv4();
-        const userItem = {
-            id,
-            name: userData.name,
-            email: userData.email,
-            password: hashedPassword
-        }
-        userInformation.push(userItem);
-        const sql = 'INSERT INTO users SET ?';
-        connection.query(sql, userItem, function(err, result, fields) {
-            if(err) throw err;
-            res.redirect('/login');
-        })
+        bcrypt.genSalt(saltRounds, (err, salt) => {
+            bcrypt.hash(password, salt, function(err, hash) {
+                // ユニークなIDでinsert
+                const id = uuidv4();
+                const userItem = {
+                    id,
+                    name: userData.name,
+                    email: userData.email,
+                    password: hash
+                }
+                userInformation.push(userItem);
+                const sql = 'INSERT INTO users SET ?';
+                connection.query(sql, userItem, function(err, result, fields) {
+                    if(err) throw err;
+                    res.redirect('/login');
+                })
+            });
+        });
     }
 });
 
@@ -120,25 +123,25 @@ passport.use(new LocalStrategy({
 }, (email, password, done) => {
     const sql = "select * from users where email = ?";
     connection.query(sql, email, function(err, user, fields) {
-         if(bcrypt.compareSync(password, user[0].password)) {
+        if(bcrypt.compareSync(password, user[0].password)) {
             // doneに認証済みユーザー情報を与える
             return done(null, user);
         }
         return done(null, false, {message: "invalid"});
-      });
+        });
     }
 ));
 
 //  sessionに格納する
 passport.serializeUser(function(user, done) {
     done(null, user);
-  });
+});
 passport.deserializeUser(function(user, done) {
     done(null, user);
 });
 
 // ログイン判定処理
-app.post('/mypage',[
+app.post('/login',[
     // メール形式かチェック
     check('email').not().isEmpty().isEmail(),
     // アルファベットと数字かチェック
@@ -149,89 +152,41 @@ app.post('/mypage',[
         session: true,
     }),
     (req, res) => {
+        console.log(req.session);
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() });
         } else {
             const sql = "select * from users where email = ?";
             connection.query(sql, req.body.email, function(err, user, fields) {
-                req.session.user = user;
-                res.render('user', {user: req.session.user});
+                req.user = user;
+                res.redirect('/mypage');
             });
         }
 });
 
-
+// ログイン処理がOKの場合は/mypageに遷移
 app.get('/mypage', (req, res) => {
-    if(!req.session.user) {
+    if(!req.user) {
         res.redirect('/login');
+    } else {
+        const sql = "SELECT * FROM posts WHERE user_id = ?"
+        connection.query(sql, req.user[0].id, function(err, posts, fields) {
+            res.render('user', {
+                user: req.user[0],
+                posts: posts
+            });
+        });
     }
 })
 
-/* =============================================
-ユーザー情報の更新処理
-============================================= */
-app.post('/users/:id', (req, res) => {
-    const editId = req.params.id;
-    const editName = req.body.edit_name;
-    const editEmail = req.body.edit_email;
-    console.log(editName);
-    const sql = 'UPDATE users SET name = ?, email = ? WHERE id = ?';
-    connection.query(sql, [editName, editEmail, editId], function(err, result, fields) {
-        if(err) throw err;
-        res.redirect('/users');
-    })
-});
-
-// 編集画面に遷移してきたときの処理を書く
-app.get('/users/:id', (req, res) => {
-    const id = req.params.id;
-    const sql = "select * from users where id = ?";
-    connection.query(sql, id, function(err, result, fields) {
-        if (err) throw err;
-        res.render('edit', {users: result});
-    })
-});
-
-/* =============================================
-ユーザーの削除 DELETE
-============================================= */
-app.delete('/users/:id', (req, res) => {
-    const id = req.params.id;
-    const sql = "DELETE FROM users WHERE id = ?";
-    connection.query(sql, id, function(err, result, fields) {
-        if(err) throw err;
-    });
-    console.log('deleted!');
-    res.sendStatus(200);
-});
-
-/* =============================================
-usersデータのjsonを返す
-============================================= */
-app.get('/api/v1/users', (req, res) => {
-    const sql = "select * from users";
-    connection.query(sql, function(err, result, field) {
-        if (err) throw err;
-        res.json(result);
-    })
-});
-
-// ユーザー一覧表示
-app.get('/users', (req, res) => {
-    const sql = "select * from users";
-    connection.query(sql, function(err, result, fields) {
-        if (err) throw err;
-        res.render('user', {users: result});
-    });
-});
 
 /* =============================================
 投稿機能
 ============================================= */
 const postInformation = [];
 app.get('/posts', (req, res) => {
-    if(!req.session.user) {
+    if(!req.user) {
         res.redirect('/login');
     } else {
         // 投稿データの取得
@@ -239,7 +194,7 @@ app.get('/posts', (req, res) => {
         connection.query(sql, (err, result, fields) => {
             if (err) throw err;
             res.render('posts', {
-                user: req.session.user,
+                user: req.user[0],
                 posts: result
             });
         });
@@ -261,6 +216,40 @@ app.post('/posts', [
         if(err) throw err;
         res.redirect('/posts');
     })
+});
+
+
+/* =============================================
+投稿の更新、削除
+============================================= */
+// 更新
+app.post('/post/:id/update', (req, res) => {
+    const editContent = req.body.edit_content;
+    const postId = req.body.post_id;
+    const editItems = [editContent, postId];
+    const spl = "UPDATE posts SET content = ? WHERE id = ?";
+    connection.query(spl, editItems, (err, result, fields) => {
+        if(err) throw err;
+        res.redirect('/posts');
+    });
+});
+
+// 削除
+app.post('/post/:id/delete', (req, res) => {
+    const postId = req.params.id;
+    const sql = 'DELETE FROM posts WHERE id = ?';
+    connection.query(sql, postId, (err, result, fields) => {
+        if(err) throw err;
+        res.redirect('/posts');
+    });
+});
+
+/* =============================================
+ログアウト
+============================================= */
+app.get('/logout', function(req, res){
+    req.logout();
+    res.redirect('/');
 });
 
 

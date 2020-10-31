@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js MySQL デモ</title>
+    <style>
+        body {
+            background-color: #eee;
+        }
+        .form {
+            border: 1px solid #ddd;
+            position: relative;
+            background-color: #fff;
+            padding: 30px;
+            width: 320px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .form > .title {
+            text-align: center;
+        }
+        .edit_user__form p + p {
+            margin-top: 20px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        button[type="submit"] {
+            width: 100%;
+            height: 40px;
+            border: none;
+            box-sizing: border-box;
+            padding: 0 10px;
+            border-radius: 5px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            background-color: #eee;
+        }
+        button[type="submit"] {
+            background-color: skyblue;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: .3s;
+        }
+        button[type="submit"]:hover {
+            opacity: .8;
+            transition: .3s;
+        }
+        .edit_user__close_button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .to_signin {
+            text-align: center;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="form">
+        <h2 class="title">ログイン画面</h2>
+        <form action="/login" method="POST">
+            <p><input type="email" name="email" placeholder="メールアドレス"></p>
+            <p><input type="password" name="password" placeholder="パスワード(アルファベットと数字の組み合わせ)"></p>
+            <p><button type="submit">ログイン</button></p>
+        </form>
+        <a href="/signin" class="to_signin">登録がまだの方</a>
+    </div>
+</body>
+</html>

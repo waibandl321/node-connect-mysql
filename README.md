@@ -7,7 +7,7 @@
 
 ■ views  
 signin.ejs : サインインのフォーム  
-login.ejs : ログインフォーム
-success.ejs : ログイン成功時の遷移先
+login.ejs : ログインフォーム  
+success.ejs : ログイン成功時の遷移先  
 
 
